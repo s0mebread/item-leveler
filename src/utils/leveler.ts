@@ -25,7 +25,8 @@
 
  */
 
-import { Stat, PrimaryStatType } from '@/typings'
+import { Stat, Stats, PrimaryStatType, Item } from '@/typings'
+import _ from 'lodash'
 
 function getStatModifier(stat: Stat): number {
   if (PrimaryStatType.includes(stat.type)) {
@@ -58,4 +59,18 @@ export function levelUpStat(stat: Stat): Stat {
   }
 
   return levelUp;
+}
+
+export function levelUpItem(item: Item): Item {
+  // let leveledUpStats: Array<Stat>;
+  // do {
+  //   leveledUpStats = item.stats.map(stat => levelUpStat(stat));
+  // } while (_.eq(item.stats, leveledUpStats))
+  
+  // const leveledUp: Item = {
+  //   stats: leveledUpStats,
+  //   level: item.level + 1
+  // };
+
+  // return leveledUp;
 }

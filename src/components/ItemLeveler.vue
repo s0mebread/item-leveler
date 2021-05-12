@@ -10,6 +10,9 @@
         </th>
       </tr>
       <tr>
+        <td>
+          <InputNumber @input="onStatInput(PrimaryStatTypeEnum.str, $event)" :min="0" />
+        </td>
       </tr>
     </table>
   </div>
@@ -18,17 +21,20 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import { mapState } from 'vuex'
-import { Item } from '@/typings'
+import { Item, Stats, PrimaryStatTypeEnum } from '@/typings'
+import InputNumber from 'primevue/inputnumber';
 
 @Component({
-  computed: {
-    ...mapState({
-      item: 'item'
-    })
+  components: {
+    InputNumber
   }
 })
 export default class ItemLeveler extends Vue {
-  item!: Item;
+  PrimaryStatTypeEnum = PrimaryStatTypeEnum;
+  item: Item = {
+    stats: {} as Stats,
+    level: 1
+  };
   mainStats = ['STR', 'DEX', 'INT', 'LUK'];
   otherStats = ['HP', 'MP', 'WA', 'MA', 'WDEF', 'MDEF', 'ACC', 'AVOID', 'SPEED', 'JUMP'];
 
@@ -36,6 +42,10 @@ export default class ItemLeveler extends Vue {
     return this.mainStats.concat(this.otherStats);
   }
 
+  onStatInput(type: string, value: number): void {
+    console.log('type: ', type);
+    console.log('value: ', value);
+  }
 }
 </script>
 

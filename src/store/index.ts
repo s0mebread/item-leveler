@@ -6,7 +6,7 @@ import _ from 'lodash'
 Vue.use(Vuex)
 
 const initialState: RootState = {
-  item: []
+  itemLevels: []
 }
 
 const state = _.clone(initialState);
