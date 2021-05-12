@@ -25,11 +25,13 @@
 
  */
 
-import { Stat, Stats, PrimaryStatType, Item } from '@/typings'
+import { Stat, Stats, StatType, Item } from '@/types'
 import _ from 'lodash'
 
+const PRIMARY_STAT_TYPES = [ StatType.str, StatType.dex, StatType.int, StatType.luk ];
+
 function getStatModifier(stat: Stat): number {
-  if (PrimaryStatType.includes(stat.type)) {
+  if (PRIMARY_STAT_TYPES.includes(stat.type)) {
     return 4;
   } else {
     return 16;
@@ -40,37 +42,43 @@ function randomIntFromInterval(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
-export function levelUpStat(stat: Stat): Stat {
-  const modifier = getStatModifier(stat);
-  const x = 1 + Math.floor(stat.value / modifier);
-  const y = (x * (x + 1) / 2) + x;
-  const z = randomIntFromInterval(0, Math.floor(y));
-  let levelUp: Stat = {
-    type: stat.type,
-    value: stat.value
-  }
-
-  if (z >= x) {
-    if (stat.type === 'speed') {
-      levelUp.value = stat.value + 1;
-    } else {
-      levelUp.value = 1 + Math.floor((-1 + Math.sqrt((8 * (z - x)) + 1)) / 2);
+export function levelUpStat(stat: Stat | null): Stat | null {
+  if (stat) {
+    const modifier = getStatModifier(stat);
+    const x = 1 + Math.floor(stat.value / modifier);
+    const y = (x * (x + 1) / 2) + x;
+    const z = randomIntFromInterval(0, Math.floor(y));
+    let levelUp: Stat = {
+      type: stat.type,
+      value: stat.value
     }
+  
+    if (z >= x) {
+      if (stat.type === 'speed') {
+        levelUp.value = stat.value + 1;
+      } else {
+        levelUp.value = 1 + Math.floor((-1 + Math.sqrt((8 * (z - x)) + 1)) / 2);
+      }
+    }
+    return levelUp;
   }
 
-  return levelUp;
+  return stat;
 }
 
 export function levelUpItem(item: Item): Item {
-  // let leveledUpStats: Array<Stat>;
-  // do {
-  //   leveledUpStats = item.stats.map(stat => levelUpStat(stat));
-  // } while (_.eq(item.stats, leveledUpStats))
-  
-  // const leveledUp: Item = {
-  //   stats: leveledUpStats,
-  //   level: item.level + 1
-  // };
+  let leveledUpItem: Item = {
+    stats: _.cloneDeep(item.stats),
+    level: item.level + 1
+  }
 
-  // return leveledUp;
+  do {
+    for(const stat in item.stats) {
+      if (item.stats[stat] != null) {
+        leveledUpItem.stats[stat] = levelUpStat(item.stats[stat]);
+      }
+    }
+  } while (_.eq(item.stats, leveledUpItem.stats))
+
+  return leveledUpItem;
 }

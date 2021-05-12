@@ -11,6 +11,7 @@
     "@types/lodash": "^4.14.168",
     "core-js": "^3.6.5",
     "lodash": "^4.17.21",
+    "primeflex": "^2.0.0",
     "primeicons": "^4.1.0",
     "primevue": "^2.4.1",
     "vue": "^2.6.11",

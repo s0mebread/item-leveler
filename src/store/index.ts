@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import { RootState } from '@/typings'
+import { RootState } from '@/types'
 import _ from 'lodash'
 
 Vue.use(Vuex)
@@ -9,7 +9,7 @@ const initialState: RootState = {
   itemLevels: []
 }
 
-const state = _.clone(initialState);
+const state = _.cloneDeep(initialState);
 
 export default new Vuex.Store({
   state: state,
