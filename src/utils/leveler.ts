@@ -25,13 +25,13 @@
 
  */
 
-import { Stat, Stats, StatType, Item } from '@/types'
+import { Item, Stats } from '@/types'
 import _ from 'lodash'
 
-const PRIMARY_STAT_TYPES = [ StatType.str, StatType.dex, StatType.int, StatType.luk ];
+const PRIMARY_STAT_TYPES = [ 'str', 'dex', 'int', 'luk' ];
 
-function getStatModifier(stat: Stat): number {
-  if (PRIMARY_STAT_TYPES.includes(stat.type)) {
+function getStatModifier(stat: string): number {
+  if (PRIMARY_STAT_TYPES.includes(stat)) {
     return 4;
   } else {
     return 16;
@@ -42,43 +42,77 @@ function randomIntFromInterval(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
-export function levelUpStat(stat: Stat | null): Stat | null {
-  if (stat) {
-    const modifier = getStatModifier(stat);
-    const x = 1 + Math.floor(stat.value / modifier);
-    const y = (x * (x + 1) / 2) + x;
-    const z = randomIntFromInterval(0, Math.floor(y));
-    let levelUp: Stat = {
-      type: stat.type,
-      value: stat.value
-    }
-  
-    if (z >= x) {
-      if (stat.type === 'speed') {
-        levelUp.value = stat.value + 1;
-      } else {
-        levelUp.value = 1 + Math.floor((-1 + Math.sqrt((8 * (z - x)) + 1)) / 2);
-      }
-    }
-    return levelUp;
-  }
+export function statLevelUpAmount(stat: string, value: number): number {
+  const modifier = getStatModifier(stat);
+  const x = 1 + Math.floor(value / modifier);
+  const y = (x * (x + 1) / 2) + x;
+  const z = randomIntFromInterval(0, Math.floor(y));
+  let leveledUpStat: number = value;
 
-  return stat;
+  if (z < x) {
+    leveledUpStat = 0;
+  } else {
+    if (stat === 'speed' || stat === 'jump') {
+      leveledUpStat = 1;
+    } else {
+      leveledUpStat = 1 + Math.floor((-1 + Math.sqrt((8 * (z - x)) + 1)) / 2);
+    }
+  }
+  return leveledUpStat;
+}
+
+export function statMaxLevelUpAmount(stat: string, value: number): number {
+  const modifier = getStatModifier(stat);
+  const x = 1 + Math.floor(value / modifier);
+  const y = (x * (x + 1) / 2) + x;
+  const z = Math.floor(y);
+  let leveledUpStat: number = value;
+
+  if (z < x) {
+    leveledUpStat = 0;
+  } else {
+    if (stat === 'speed' || stat === 'jump') {
+      leveledUpStat = 1;
+    } else {
+      leveledUpStat = 1 + Math.floor((-1 + Math.sqrt((8 * (z - x)) + 1)) / 2);
+    }
+  }
+  return leveledUpStat;
 }
 
 export function levelUpItem(item: Item): Item {
-  let leveledUpItem: Item = {
+  const leveledUpItem: Item = {
+    level: item.level + 1,
     stats: _.cloneDeep(item.stats),
-    level: item.level + 1
+    maxStats: {} as Stats
   }
 
   do {
     for(const stat in item.stats) {
       if (item.stats[stat] != null) {
-        leveledUpItem.stats[stat] = levelUpStat(item.stats[stat]);
+        const leveledUpStat = item.stats[stat]! + statLevelUpAmount(stat, item.stats[stat]!);
+        leveledUpItem.stats[stat] = leveledUpStat;
+
+        const maxLeveledUpStat = item.stats[stat]! + statMaxLevelUpAmount(stat, item.stats[stat]!);
+        leveledUpItem.maxStats[stat] = maxLeveledUpStat;
       }
     }
   } while (_.eq(item.stats, leveledUpItem.stats))
 
   return leveledUpItem;
+}
+
+export function simulateManyLevels(stat: string, value: number, runs: number) {
+  const results: { [key: number]: number } = {};
+  for (let i = 0; i < runs; i++) {
+    const leveledUpStat = value + statLevelUpAmount(stat, value);
+
+    if (leveledUpStat in results) {
+      results[leveledUpStat]++;
+    } else {
+      results[leveledUpStat] = 1;
+    }
+  }
+
+  return results;
 }
