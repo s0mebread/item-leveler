@@ -47,18 +47,18 @@ export function statLevelUpAmount(stat: string, value: number): number {
   const x = 1 + Math.floor(value / modifier);
   const y = (x * (x + 1) / 2) + x;
   const z = randomIntFromInterval(0, Math.floor(y));
-  let leveledUpStat: number = value;
+  let levelUpAmount: number = value;
 
   if (z < x) {
-    leveledUpStat = 0;
+    levelUpAmount = 0;
   } else {
     if (stat === 'speed' || stat === 'jump') {
-      leveledUpStat = 1;
+      levelUpAmount = 1;
     } else {
-      leveledUpStat = 1 + Math.floor((-1 + Math.sqrt((8 * (z - x)) + 1)) / 2);
+      levelUpAmount = 1 + Math.floor((-1 + Math.sqrt((8 * (z - x)) + 1)) / 2);
     }
   }
-  return leveledUpStat;
+  return levelUpAmount;
 }
 
 export function statMaxLevelUpAmount(stat: string, value: number): number {
@@ -66,35 +66,36 @@ export function statMaxLevelUpAmount(stat: string, value: number): number {
   const x = 1 + Math.floor(value / modifier);
   const y = (x * (x + 1) / 2) + x;
   const z = Math.floor(y);
-  let leveledUpStat: number = value;
+  let levelUpAmount: number = value;
 
   if (z < x) {
-    leveledUpStat = 0;
+    levelUpAmount = 0;
   } else {
     if (stat === 'speed' || stat === 'jump') {
-      leveledUpStat = 1;
+      levelUpAmount = 1;
     } else {
-      leveledUpStat = 1 + Math.floor((-1 + Math.sqrt((8 * (z - x)) + 1)) / 2);
+      levelUpAmount = 1 + Math.floor((-1 + Math.sqrt((8 * (z - x)) + 1)) / 2);
     }
   }
-  return leveledUpStat;
+
+  return levelUpAmount;
 }
 
 export function levelUpItem(item: Item): Item {
   const leveledUpItem: Item = {
     level: item.level + 1,
     stats: _.cloneDeep(item.stats),
-    maxStats: {} as Stats
+    maxStats: _.cloneDeep(item.maxStats)
   }
 
   do {
     for(const stat in item.stats) {
       if (item.stats[stat] != null) {
-        const leveledUpStat = item.stats[stat]! + statLevelUpAmount(stat, item.stats[stat]!);
-        leveledUpItem.stats[stat] = leveledUpStat;
+        const levelUpAmount = item.stats[stat]! + statLevelUpAmount(stat, item.stats[stat]!);
+        leveledUpItem.stats[stat] = levelUpAmount;
 
-        const maxLeveledUpStat = item.stats[stat]! + statMaxLevelUpAmount(stat, item.stats[stat]!);
-        leveledUpItem.maxStats[stat] = maxLeveledUpStat;
+        const maxlevelUpAmount = item.maxStats[stat]! + statMaxLevelUpAmount(stat, item.maxStats[stat]!);
+        leveledUpItem.maxStats[stat] = maxlevelUpAmount;
       }
     }
   } while (_.eq(item.stats, leveledUpItem.stats))

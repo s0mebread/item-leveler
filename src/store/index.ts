@@ -18,17 +18,28 @@ const actions = {
     payload: { item: Item, startLevel: number, endLevel: number }
   ): void {
     commit('addItemLevel', payload.item);
-    let leveledUpItem: Item;
+    let leveledUpItem: Item = payload.item;
     for (let i = payload.startLevel; i < payload.endLevel; i++) {
-      leveledUpItem = levelUpItem(payload.item);
+      leveledUpItem = levelUpItem(leveledUpItem);
       commit('addItemLevel', leveledUpItem);
     }
+  },
+
+  resetItem({ commit }: { commit: Commit }): Promise<void> {
+    return new Promise((resolve, _reject) => {
+      commit('resetItem');
+      resolve();
+    });
   }
 }
 
 const mutations = {
   addItemLevel(state: RootState, payload: Item) {
     state.itemLevels.push(payload);
+  },
+
+  resetItem(state: RootState) {
+    Object.assign(state, _.cloneDeep(initialState));
   }
 }
 

@@ -22,6 +22,5 @@ export default class Home extends Vue {}
   padding-left: 15px;
   margin-right: auto;
   margin-left: auto;
-  max-width: 960px;
 }
 </style>
