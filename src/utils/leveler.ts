@@ -25,7 +25,7 @@
 
  */
 
-import { Item, Stats } from '@/types'
+import { Item, LevelUpResult } from '@/types'
 import _ from 'lodash'
 
 const PRIMARY_STAT_TYPES = [ 'str', 'dex', 'int', 'luk' ];
@@ -85,17 +85,21 @@ export function levelUpItem(item: Item): Item {
   const leveledUpItem: Item = {
     level: item.level + 1,
     stats: _.cloneDeep(item.stats),
-    maxStats: _.cloneDeep(item.maxStats)
+    maxStats: _.cloneDeep(item.stats),
+    maxOfMaxStats: _.cloneDeep(item.maxOfMaxStats)
   }
 
   do {
-    for(const stat in item.stats) {
+    for (const stat in item.stats) {
       if (item.stats[stat] != null) {
         const levelUpAmount = item.stats[stat]! + statLevelUpAmount(stat, item.stats[stat]!);
         leveledUpItem.stats[stat] = levelUpAmount;
 
-        const maxlevelUpAmount = item.maxStats[stat]! + statMaxLevelUpAmount(stat, item.maxStats[stat]!);
+        const maxlevelUpAmount = item.stats[stat]! + statMaxLevelUpAmount(stat, item.stats[stat]!);
         leveledUpItem.maxStats[stat] = maxlevelUpAmount;
+
+        const maxOfMaxlevelUpAmount = item.maxOfMaxStats[stat]! + statMaxLevelUpAmount(stat, item.maxOfMaxStats[stat]!);
+        leveledUpItem.maxOfMaxStats[stat] = maxOfMaxlevelUpAmount;
       }
     }
   } while (_.eq(item.stats, leveledUpItem.stats))
@@ -103,17 +107,34 @@ export function levelUpItem(item: Item): Item {
   return leveledUpItem;
 }
 
-export function simulateManyLevels(stat: string, value: number, runs: number) {
-  const results: { [key: number]: number } = {};
-  for (let i = 0; i < runs; i++) {
-    const leveledUpStat = value + statLevelUpAmount(stat, value);
+export function simulateManyLevels(item: Item, levels: number, runs: number): Array<LevelUpResult> {
+  const levelUpResults: Array<LevelUpResult> = [];
 
-    if (leveledUpStat in results) {
-      results[leveledUpStat]++;
-    } else {
-      results[leveledUpStat] = 1;
+  for (const stat in item.stats) {
+    if (item.stats[stat] != null) {
+      const dataset: LevelUpResult = {
+        stat: stat,
+        results: {}
+      };
+
+      for (let i = 0; i < runs; i++) {
+        let leveledUpStat = item.stats[stat]!;
+        for (let j = 0; j < levels; j++) {
+          leveledUpStat += statLevelUpAmount(stat, leveledUpStat);
+        }
+    
+        if (leveledUpStat in dataset.results) {
+          dataset.results[leveledUpStat]++;
+        } else {
+          dataset.results[leveledUpStat] = 1;
+        }
+      }
+
+      levelUpResults.push(dataset);
     }
   }
 
-  return results;
+  
+
+  return levelUpResults;
 }

@@ -1,5 +1,5 @@
 <template>
-  <div class="p-grid p-jc-center">
+  <div class="p-grid p-flex-column p-ai-center">
     <card class="p-col-10 p-my-4">
       <template #content>
         <div class="p-fluid p-formgrid p-grid">
@@ -77,11 +77,15 @@
     </card>
 
 
-    <transition-group name="dynamic-box" tag="div" class="p-grid p-fluid">
+    <transition-group name="dynamic-box" tag="div" class="p-grid p-fluid p-col-12">
       <div v-for="(itemLevel, index) of itemLevels" :key="index" class="p-col">
-          <div class="box">
-            <item-level :itemLevel="itemLevel" />
-          </div>
+        <div class="box">
+          <item-level 
+            :startLevel="startLevel"
+            :previousItemLevel="itemLevels[index - 1]"
+            :itemLevel="itemLevel"
+          />
+        </div>
       </div>
     </transition-group>
   </div>
@@ -90,22 +94,25 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import { mapState, mapActions } from 'vuex'
-import { Item, Stats } from '@/types'
+import { Item, LevelUpResult, Stats } from '@/types'
 import Button from 'primevue/button'
 import Card from 'primevue/card'
 import InputNumber from 'primevue/inputnumber'
 import ItemLevel from './ItemLevel.vue'
+import _ from 'lodash'
 
 @Component({
   methods: {
     ...mapActions({
       calculateLevels: 'calculateLevels',
+      calculateManyLevelUps: 'calculateManyLevelUps',
       resetItem: 'resetItem'
     })
   },
   computed: {
     ...mapState({
-      itemLevels: 'itemLevels'
+      itemLevels: 'itemLevels',
+      levelUpResults: 'levelUpResults'
     })
   },
   components: {
@@ -117,7 +124,11 @@ import ItemLevel from './ItemLevel.vue'
 })
 export default class ItemLeveler extends Vue {
   itemLevels!: Array<Item>;
+  levelUpResults!: Array<LevelUpResult>;
   calculateLevels!: (
+    payload: { item: Item, startLevel: number, endLevel: number }
+  ) => Promise<void>;
+  calculateManyLevelUps!: (
     payload: { item: Item, startLevel: number, endLevel: number }
   ) => Promise<void>;
   resetItem!: () => Promise<void>;
@@ -125,7 +136,8 @@ export default class ItemLeveler extends Vue {
   item: Item = {
     level: 1,
     stats: {} as Stats,
-    maxStats: {} as Stats
+    maxStats: {} as Stats,
+    maxOfMaxStats: {} as Stats
   };
   startLevel: number | null = 1;
   endLevel: number | null = 7;
@@ -135,12 +147,19 @@ export default class ItemLeveler extends Vue {
       if (this.startLevel != null && this.endLevel != null) {
         this.item.level = this.startLevel;
         this.item.maxStats = this.item.stats;
+        this.item.maxOfMaxStats = this.item.stats;
 
         this.calculateLevels({
-          item: this.item,
+          item: _.cloneDeep(this.item),
           startLevel: this.startLevel,
           endLevel: this.endLevel
         });
+
+        // this.calculateManyLevelUps({
+        //   item: _.cloneDeep(this.item),
+        //   startLevel: this.startLevel,
+        //   endLevel: this.endLevel
+        // });
       }
     });
   }

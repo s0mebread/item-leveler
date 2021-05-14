@@ -1,5 +1,6 @@
 export interface RootState {
   itemLevels: Array<Item>;
+  levelUpResults: Array<LevelUpResult>;
 }
 
 export interface Stats {
@@ -24,4 +25,20 @@ export interface Item {
   level: number;
   stats: Stats;
   maxStats: Stats;
+  maxOfMaxStats: Stats;
+}
+
+export interface LevelUpResult {
+  stat: string;
+  results: {
+    [key: number]: number;
+  }
+}
+
+export interface ItemLevelViewModel {
+  stat: string;
+  previousStatValue: number | null;
+  statValue: number | null;
+  maxStatValue: number | null;
+  maxOfMaxStatValue: number | null;
 }

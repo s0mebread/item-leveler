@@ -5,29 +5,42 @@
         <div class="p-text-center">Level {{ itemLevel.level }}</div>
       </template>
       <template #content>
-        <div class="p-grid stat-output"
-          v-for="(statLine, index) in statArray"
+        <div class="p-grid p-flex-column stat-output"
+          v-for="(stat, index) in statArray"
           :key="index"
         >
           <div class="p-divider"></div>
-          <div class="p-col-6">
+          <div class="p-col-12">
             <div class="p-grid">
-              <div class="p-col-12">
-                <div class="box p-text-bold">{{ prettifyStatName(statLine.stat) }}:</div>
+              <div class="p-col-6">
+                <div class="box p-text-bold">{{ prettifyStatName(stat.stat) }}:</div>
               </div>
-              <div class="p-col-12">
-                <div class="box p-text-bold">Max {{ prettifyStatName(statLine.stat) }}:</div>
+              <div class="p-col-6">
+                <div class="box">{{ stat.statValue }}</div>
               </div>
             </div>
-            <div class="box box-stretched"></div>
           </div>
-          <div class="p-col-6">
+          <div class="p-col-12"
+            v-if="itemLevel.level !== startLevel"
+          >
             <div class="p-grid">
-              <div class="p-col-12">
-                <div class="box">{{ statLine.statValue }}</div>
+              <div class="p-col-6">
+                <div class="box p-text-bold">Max from {{ stat.previousStatValue }}:</div>
               </div>
-              <div class="p-col-12">
-                <div class="box">{{ statLine.maxStatValue }}</div>
+              <div class="p-col-6">
+                <div class="box">{{ stat.maxStatValue }}</div>
+              </div>
+            </div>
+          </div>
+          <div class="p-col-12"
+            v-if="itemLevel.level !== startLevel"
+          >
+            <div class="p-grid">
+              <div class="p-col-6">
+                <div class="box p-text-bold">Max of Max:</div>
+              </div>
+              <div class="p-col-6">
+                <div class="box">{{ stat.maxOfMaxStatValue }}</div>
               </div>
             </div>
           </div>
@@ -39,7 +52,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import { Item } from '@/types'
+import { Item, ItemLevelViewModel } from '@/types'
 import Card from 'primevue/card'
 import Divider from 'primevue/divider'
 
@@ -50,17 +63,29 @@ import Divider from 'primevue/divider'
   }
 })
 export default class ItemLevel extends Vue {
+  @Prop() readonly startLevel!: number;
+  @Prop() readonly previousItemLevel!: Item;
   @Prop() readonly itemLevel!: Item;
   statOrder = ['str', 'dex', 'int', 'luk', 'hp', 'mp', 'wa', 'ma', 'wdef', 'mdef', 'acc', 'avoid', 'speed', 'jump'];
 
-  get statArray(): Array<{ stat: string, statValue: number | null, maxStatValue: number | null }> {
-    const statArray: Array<{ stat: string, statValue: number | null, maxStatValue: number | null }> = [];
+  get statArray(): Array<ItemLevelViewModel> {
+    const statArray: Array<ItemLevelViewModel> = [];
+
     this.statOrder.forEach(stat => {
+      let previousStatValue;
+      if (this.previousItemLevel != null) {
+        previousStatValue = this.previousItemLevel.stats[stat];
+      } else {
+        previousStatValue = this.itemLevel.stats[stat];
+      }
+
       if (this.itemLevel.stats[stat] != null) {
         statArray.push({
           stat: stat,
+          previousStatValue: previousStatValue,
           statValue: this.itemLevel.stats[stat],
           maxStatValue: this.itemLevel.maxStats[stat],
+          maxOfMaxStatValue: this.itemLevel.maxOfMaxStats[stat]
         })
       }
     })
