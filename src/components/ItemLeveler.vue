@@ -88,6 +88,16 @@
         </div>
       </div>
     </transition-group>
+
+    <transition-group name="dynamic-box" tag="div" class="p-grid p-fluid p-col-12">
+      <div v-for="(levelUpResult, index) of levelUpResults" :key="index" class="p-col">
+        <div class="box">
+          <stat-chart 
+            :dataset="levelUpResult"
+          />
+        </div>
+      </div>
+    </transition-group>
   </div>
 </template>
 
@@ -99,6 +109,7 @@ import Button from 'primevue/button'
 import Card from 'primevue/card'
 import InputNumber from 'primevue/inputnumber'
 import ItemLevel from './ItemLevel.vue'
+import StatChart from './StatChart.vue'
 import _ from 'lodash'
 
 @Component({
@@ -119,7 +130,8 @@ import _ from 'lodash'
     Button,
     Card,
     InputNumber,
-    ItemLevel
+    ItemLevel,
+    StatChart
   }
 })
 export default class ItemLeveler extends Vue {
@@ -155,11 +167,11 @@ export default class ItemLeveler extends Vue {
           endLevel: this.endLevel
         });
 
-        // this.calculateManyLevelUps({
-        //   item: _.cloneDeep(this.item),
-        //   startLevel: this.startLevel,
-        //   endLevel: this.endLevel
-        // });
+        this.calculateManyLevelUps({
+          item: _.cloneDeep(this.item),
+          startLevel: this.startLevel,
+          endLevel: this.endLevel
+        });
       }
     });
   }

@@ -30,7 +30,7 @@ const actions = {
     { commit }: { commit: Commit }, 
     payload: { item: Item, startLevel: number, endLevel: number }
   ): void {
-    const dataset = simulateManyLevels(payload.item, payload.endLevel - payload.startLevel, 100000);
+    const dataset = simulateManyLevels(payload.item, payload.endLevel - payload.startLevel, 1000000);
 
     commit('addLevelUpResults', dataset);
   },
