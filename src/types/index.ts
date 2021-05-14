@@ -1,6 +1,7 @@
 export interface RootState {
   itemLevels: Array<Item>;
   levelUpResults: Array<LevelUpResult>;
+  totalSimulations: number;
 }
 
 export interface Stats {

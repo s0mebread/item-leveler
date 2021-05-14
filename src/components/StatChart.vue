@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="p-d-flex p-jc-center">
     <apexchart width="500" height="350" type="line" :options="chartOptions" :series="series"></apexchart>
   </div>
 </template>
@@ -7,9 +7,14 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { LevelUpResult } from '@/types'
+import Card from 'primevue/card'
 import _ from 'lodash'
 
-@Component
+@Component({
+  components: {
+    Card
+  }
+})
 export default class StatChart extends Vue {
   @Prop() readonly dataset!: LevelUpResult
 
@@ -22,10 +27,15 @@ export default class StatChart extends Vue {
     },
     xaxis: {
       categories: this.getDatasetKeys
+    },
+    yaxis: {
+      labels: {
+        show: false
+      }
     }
   }
   series = [{
-    name: this.dataset.stat,
+    name: 'End Result Count',
     data: this.getDatasetValues
   }];
 

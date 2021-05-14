@@ -8,7 +8,8 @@ Vue.use(Vuex)
 
 const initialState: RootState = {
   itemLevels: [],
-  levelUpResults: []
+  levelUpResults: [],
+  totalSimulations: 1000000
 }
 
 const state = _.cloneDeep(initialState);
@@ -27,10 +28,10 @@ const actions = {
   },
 
   calculateManyLevelUps(
-    { commit }: { commit: Commit }, 
+    { commit, state }: { commit: Commit, state: RootState }, 
     payload: { item: Item, startLevel: number, endLevel: number }
   ): void {
-    const dataset = simulateManyLevels(payload.item, payload.endLevel - payload.startLevel, 1000000);
+    const dataset = simulateManyLevels(payload.item, payload.endLevel - payload.startLevel, state.totalSimulations);
 
     commit('addLevelUpResults', dataset);
   },

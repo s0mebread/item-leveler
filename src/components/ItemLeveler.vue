@@ -76,7 +76,6 @@
       </template>
     </card>
 
-
     <transition-group name="dynamic-box" tag="div" class="p-grid p-fluid p-col-12">
       <div v-for="(itemLevel, index) of itemLevels" :key="index" class="p-col">
         <div class="box">
@@ -89,27 +88,26 @@
       </div>
     </transition-group>
 
-    <transition-group name="dynamic-box" tag="div" class="p-grid p-fluid p-col-12">
-      <div v-for="(levelUpResult, index) of levelUpResults" :key="index" class="p-col">
-        <div class="box">
-          <stat-chart 
-            :dataset="levelUpResult"
-          />
-        </div>
-      </div>
-    </transition-group>
+    <card class="p-col-10 p-my-4" v-if="itemLevels.length > 0">
+      <template #title>
+        <div class="p-text-center">1,000,000 Level Up Results By Stat</div>
+      </template>
+      <template #content>
+        <stat-distribution-charts />
+      </template>
+    </card>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import { mapState, mapActions } from 'vuex'
-import { Item, LevelUpResult, Stats } from '@/types'
+import { Item, Stats } from '@/types'
 import Button from 'primevue/button'
 import Card from 'primevue/card'
 import InputNumber from 'primevue/inputnumber'
 import ItemLevel from './ItemLevel.vue'
-import StatChart from './StatChart.vue'
+import StatDistributionCharts from './StatDistributionCharts.vue'
 import _ from 'lodash'
 
 @Component({
@@ -123,7 +121,6 @@ import _ from 'lodash'
   computed: {
     ...mapState({
       itemLevels: 'itemLevels',
-      levelUpResults: 'levelUpResults'
     })
   },
   components: {
@@ -131,12 +128,11 @@ import _ from 'lodash'
     Card,
     InputNumber,
     ItemLevel,
-    StatChart
+    StatDistributionCharts
   }
 })
 export default class ItemLeveler extends Vue {
   itemLevels!: Array<Item>;
-  levelUpResults!: Array<LevelUpResult>;
   calculateLevels!: (
     payload: { item: Item, startLevel: number, endLevel: number }
   ) => Promise<void>;
