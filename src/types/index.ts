@@ -40,6 +40,9 @@ export interface ItemLevelViewModel {
   stat: string;
   previousStatValue: number | null;
   statValue: number | null;
+  statIncrement: number | null;
   maxStatValue: number | null;
+  maxStatIncrement: number | null;
   maxOfMaxStatValue: number | null;
+  maxOfMaxStatIncrement: number | null;
 }
