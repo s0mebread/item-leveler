@@ -61,13 +61,13 @@
           </div>
         </div>
         <div class="p-fluid p-grid p-jc-center">
-          <div class="p-col p-field level-input">
+          <div class="p-col-2 p-field level-input">
             <label for="start-level">Start Level</label>
-            <InputNumber id="start-level" v-model="startLevel" :min="1" :max="10" v-on:keyup.enter="onCalculateClick" />
+            <Dropdown v-model="startLevel" :options="startLevelOptions" :scrollHeight="500" />
           </div>
-          <div class="p-col p-field level-input">
+          <div class="p-col-2 p-field level-input">
             <label for="start-level">End Level</label>
-            <InputNumber id="end-level" v-model="endLevel" :min="2" :max="11" v-on:keyup.enter="onCalculateClick" />
+            <Dropdown v-model="endLevel" :options="endLevelOptions" :scrollHeight="500" />
           </div>
         </div>
         <div class="p-d-flex p-jc-center">
@@ -100,11 +100,12 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Vue, Watch } from 'vue-property-decorator'
 import { mapState, mapActions } from 'vuex'
 import { Item, Stats } from '@/types'
 import Button from 'primevue/button'
 import Card from 'primevue/card'
+import Dropdown from 'primevue/dropdown'
 import InputNumber from 'primevue/inputnumber'
 import ItemLevel from './ItemLevel.vue'
 import StatDistributionCharts from './StatDistributionCharts.vue'
@@ -126,6 +127,7 @@ import _ from 'lodash'
   components: {
     Button,
     Card,
+    Dropdown,
     InputNumber,
     ItemLevel,
     StatDistributionCharts
@@ -171,6 +173,39 @@ export default class ItemLeveler extends Vue {
       }
     });
   }
+  
+  get startLevelOptions(): Array<number> {
+    return Array.from({ length: 10 }, (_element, index) => index + 1);
+  }
+
+  get endLevelOptions(): Array<number> {
+    var endLevelOptions = [];
+      if (this.startLevel != null) {  
+        for (let i = this.startLevel + 1; i <= 11; i++) {
+          endLevelOptions.push(i);
+        }
+      }
+    return endLevelOptions;
+  }
+
+  @Watch('startLevel')
+  onStartLevelChanged(newVal: number): void {
+    switch (newVal) {
+      case 1:
+        this.endLevel = 7;
+        break;
+      case 7:
+        this.endLevel = 10;
+        break;
+      case 10:
+        this.endLevel = 11;
+        break;
+      default:
+        break;
+    }
+  }
+
+  
 }
 </script>
 
