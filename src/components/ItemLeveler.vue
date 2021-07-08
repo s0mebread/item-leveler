@@ -190,18 +190,21 @@ export default class ItemLeveler extends Vue {
 
   @Watch('startLevel')
   onStartLevelChanged(newVal: number): void {
-    switch (newVal) {
-      case 1:
-        this.endLevel = 7;
-        break;
-      case 7:
-        this.endLevel = 10;
-        break;
-      case 10:
-        this.endLevel = 11;
-        break;
-      default:
-        break;
+    if ((this.endLevel) && (this.endLevel <= newVal)) {
+      switch (newVal) {
+        case 1:
+          this.endLevel = 7;
+          break;
+        case 7:
+          this.endLevel = 10;
+          break;
+        case 10:
+          this.endLevel = 11;
+          break;
+        default:
+          this.endLevel = newVal + 1;
+          break;
+      }
     }
   }
 
